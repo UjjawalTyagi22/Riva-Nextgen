@@ -52,8 +52,8 @@ const AudioSphere = ({ audioLevel, isSpeaking }) => {
     >
       <div
         style={{
-          width: '100%',  // CHANGED: Controls sphere size (50% = smaller, 100% = full screen)
-          height: '100%', // CHANGED: Match width for perfect circle
+          width: '113%',  // CHANGED: Controls sphere size (50% = smaller, 100% = full screen)
+          height: '113%', // CHANGED: Match width for perfect circle
           filter: `brightness(${brightness}) contrast(1.3)`,
           transform: `scale(${scale})`,
           transition: 'all 0.15s ease-out'
@@ -71,7 +71,7 @@ const AudioSphere = ({ audioLevel, isSpeaking }) => {
             objectFit: 'contain'  // CHANGED: 'contain' keeps sphere centered and visible
           }}
         >
-          <source src="/sphere-animation.mp4" type="video/mp4" />
+          <source src="/trial.mp4" type="video/mp4" />
           <source src="/sphere-animation.webm" type="video/webm" />
           Your browser does not support the video tag.
         </video>

@@ -20,7 +20,7 @@
     "express": "^4.x.x",
     "msedge-tts": "^2.0.2",
     "multer": "^2.0.2",
-    "openai": "^6.3.0",
+    "openai": "^6.8.1",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
