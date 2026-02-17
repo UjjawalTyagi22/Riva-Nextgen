@@ -60,6 +60,14 @@ temp/
 # TypeScript build info
 *.tsbuildinfo
 
+# Large Assets
+*.mp4
+*.exe
+*.zip
+*.rar
+frontend/public/*.mp4
+frontend/public/*.exe
+
 # Package lock files (optional - uncomment to ignore)
 # package-lock.json
 # yarn.lock

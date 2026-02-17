@@ -71,7 +71,7 @@ const AudioSphere = ({ audioLevel, isSpeaking }) => {
             objectFit: 'contain'  // CHANGED: 'contain' keeps sphere centered and visible
           }}
         >
-          <source src="/trial.mp4" type="video/mp4" />
+          <source src="/trial_4.mp4" type="video/mp4" />
           <source src="/sphere-animation.webm" type="video/webm" />
           Your browser does not support the video tag.
         </video>
