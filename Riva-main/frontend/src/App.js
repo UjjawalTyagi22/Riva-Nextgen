@@ -1,39 +1,38 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
-import Showcase from './components/Showcase';
 import AudioSphere from './components/AudioSphere';
 import './App.css';
 
 // ===== ICON COMPONENTS =====
 const RestartIcon = () => (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="23 4 23 10 17 10"/>
-    <polyline points="1 20 1 14 7 14"/>
-    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+    <polyline points="23 4 23 10 17 10" />
+    <polyline points="1 20 1 14 7 14" />
+    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
   </svg>
 );
 
 const TestMicIcon = () => (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
   </svg>
 );
 
 const MicIcon = () => (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-    <line x1="12" y1="19" x2="12" y2="23"/>
-    <line x1="8" y1="23" x2="16" y2="23"/>
+    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+    <line x1="12" y1="19" x2="12" y2="23" />
+    <line x1="8" y1="23" x2="16" y2="23" />
   </svg>
 );
 
 const SendIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="22" y1="2" x2="11" y2="13"/>
-    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    <line x1="22" y1="2" x2="11" y2="13" />
+    <polygon points="22 2 15 22 11 13 2 9 22 2" />
   </svg>
 );
 
@@ -48,7 +47,8 @@ function RivaChatbot({ shouldPlayWelcome }) {
   const [audioLevel, setAudioLevel] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [hasPlayedWelcome, setHasPlayedWelcome] = useState(false);
-  
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const recognitionRef = useRef(null);
   const audioIntervalRef = useRef(null);
   const leftMessagesRef = useRef(null);
@@ -68,11 +68,11 @@ function RivaChatbot({ shouldPlayWelcome }) {
   useEffect(() => {
     const assistantMessages = messages.filter(m => m.role === 'assistant');
     const userMessages = messages.filter(m => m.role === 'user');
-    
+
     if (assistantMessages.length > 0) {
       setTimeout(() => scrollToBottom(leftMessagesRef), 100);
     }
-    
+
     if (userMessages.length > 0) {
       setTimeout(() => scrollToBottom(rightMessagesRef), 100);
     }
@@ -82,16 +82,16 @@ function RivaChatbot({ shouldPlayWelcome }) {
   useEffect(() => {
     if (shouldPlayWelcome && !hasPlayedWelcome) {
       setHasPlayedWelcome(true);
-      
+
       // Initialize TTS first
       const utterance = new SpeechSynthesisUtterance('');
       window.speechSynthesis.speak(utterance);
       ttsInitializedRef.current = true;
-      
+
       // Play welcome message after a short delay
       setTimeout(() => {
         const welcomeMessage = "Hello, I am Riva, an AI assistant for the NextGen Supercomputing Club at KIET Group of Institutions. Now, I am ready to answer all your questions";
-        
+
         // Speak the welcome message WITHOUT showing text
         speak(welcomeMessage);
       }, 500);
@@ -143,7 +143,9 @@ function RivaChatbot({ shouldPlayWelcome }) {
 
   const handleSendMessage = useCallback(async (text) => {
     const messageText = text || inputText;
-    if (!messageText.trim()) return;
+    if (!messageText.trim() || isProcessing) return;
+
+    setIsProcessing(true);
 
     const userMessage = { role: 'user', content: messageText };
     setMessages(prev => [...prev, userMessage]);
@@ -171,8 +173,10 @@ function RivaChatbot({ shouldPlayWelcome }) {
       console.error('❌ Backend error:', error);
       const errorMessage = 'Sorry, I encountered an error connecting to the server.';
       typewriterEffect(errorMessage);
+    } finally {
+      setIsProcessing(false);
     }
-  }, [inputText, typewriterEffect]);
+  }, [inputText, typewriterEffect, isProcessing]);
 
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -183,8 +187,8 @@ function RivaChatbot({ shouldPlayWelcome }) {
       recognitionRef.current.lang = 'en-US';
 
       recognitionRef.current.onresult = (event) => {
-        if (isAISpeakingRef.current) {
-          console.log('🚫 Ignoring input - AI is speaking');
+        if (isAISpeakingRef.current || isProcessing) {
+          console.log('🚫 Ignoring input - AI is speaking or processing');
           return;
         }
 
@@ -199,7 +203,7 @@ function RivaChatbot({ shouldPlayWelcome }) {
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
-          
+
           if (event.results[i].isFinal) {
             finalTranscript += transcript;
           } else {
@@ -219,7 +223,7 @@ function RivaChatbot({ shouldPlayWelcome }) {
           setInterimText('');
           setIsListening(false);
           setError(null);
-          
+
           setTimeout(() => {
             handleSendMessage(finalTranscript);
           }, 200);
@@ -229,7 +233,7 @@ function RivaChatbot({ shouldPlayWelcome }) {
       recognitionRef.current.onerror = (event) => {
         setIsListening(false);
         setInterimText('');
-        
+
         if (event.error === 'no-speech') {
           setError('No speech detected. Please speak louder.');
         } else if (event.error !== 'aborted') {
@@ -280,7 +284,7 @@ function RivaChatbot({ shouldPlayWelcome }) {
     cleanText = cleanText.replace(/^\d+\.\s+/gm, '');
     cleanText = cleanText.replace(/[_~|\\<>{}[\]]/g, '');
     cleanText = cleanText.replace(/\s+/g, ' ').trim();
-    
+
     if (!cleanText) {
       console.log('⚠️ No text to speak');
       isAISpeakingRef.current = false;
@@ -314,44 +318,44 @@ function RivaChatbot({ shouldPlayWelcome }) {
 
       const voices = await getVoices();
       console.log('🔊 Total available voices:', voices.length);
-      
+
       // 🎯 SHREYA JAIN VOICE - Google UK English Female
       let selectedVoice = null;
-      
+
       // Priority 1: Google UK English Female (Shreya Jain's voice)
-      selectedVoice = voices.find(v => 
-        v.lang.includes('en-GB') && 
-        (v.name.toLowerCase().includes('female') || 
-         v.name.toLowerCase().includes('google uk english female') ||
-         v.name.toLowerCase().includes('kate') ||
-         v.name.toLowerCase().includes('serena'))
+      selectedVoice = voices.find(v =>
+        v.lang.includes('en-GB') &&
+        (v.name.toLowerCase().includes('female') ||
+          v.name.toLowerCase().includes('google uk english female') ||
+          v.name.toLowerCase().includes('kate') ||
+          v.name.toLowerCase().includes('serena'))
       );
-      
+
       // Priority 2: Any UK English Female voice
       if (!selectedVoice) {
-        selectedVoice = voices.find(v => 
-          v.lang.includes('en-GB') && 
+        selectedVoice = voices.find(v =>
+          v.lang.includes('en-GB') &&
           !v.name.toLowerCase().includes('male')
         );
       }
-      
+
       // Priority 3: Google Female voices
       if (!selectedVoice) {
-        selectedVoice = voices.find(v => 
-          v.name.toLowerCase().includes('google') && 
+        selectedVoice = voices.find(v =>
+          v.name.toLowerCase().includes('google') &&
           v.name.toLowerCase().includes('female')
         );
       }
-      
+
       // Priority 4: Any female voice
       if (!selectedVoice) {
-        selectedVoice = voices.find(v => 
-          v.lang.includes('en') && 
-          (v.name.toLowerCase().includes('female') || 
-           v.name.toLowerCase().includes('woman'))
+        selectedVoice = voices.find(v =>
+          v.lang.includes('en') &&
+          (v.name.toLowerCase().includes('female') ||
+            v.name.toLowerCase().includes('woman'))
         );
       }
-      
+
       if (selectedVoice) {
         utterance.voice = selectedVoice;
         console.log('✅ Selected SHREYA JAIN voice:', selectedVoice.name, '|', selectedVoice.lang);
@@ -359,16 +363,16 @@ function RivaChatbot({ shouldPlayWelcome }) {
 
       const simulateAudioLevel = () => {
         speechPhaseRef.current += 0.2;
-        
+
         const baseLevel = 0.5 + Math.random() * 0.4;
         const wave1 = Math.sin(speechPhaseRef.current) * 0.3;
         const wave2 = Math.sin(speechPhaseRef.current * 2.5) * 0.2;
         const wave3 = Math.cos(speechPhaseRef.current * 1.3) * 0.15;
-        
+
         const randomSpike = Math.random() > 0.6 ? Math.random() * 0.4 : 0;
-        
+
         const targetLevel = Math.max(0.4, Math.min(1.0, baseLevel + wave1 + wave2 + wave3 + randomSpike));
-        
+
         setAudioLevel(prev => prev + (targetLevel - prev) * 0.3);
       };
 
@@ -377,7 +381,7 @@ function RivaChatbot({ shouldPlayWelcome }) {
       return new Promise((resolve) => {
         utterance.onend = () => {
           if (audioIntervalRef.current) clearInterval(audioIntervalRef.current);
-          
+
           let currentLevel = audioLevel;
           const fadeOut = setInterval(() => {
             currentLevel *= 0.7;
@@ -387,11 +391,11 @@ function RivaChatbot({ shouldPlayWelcome }) {
               setAudioLevel(0);
             }
           }, 50);
-          
+
           setIsSpeaking(false);
           isAISpeakingRef.current = false;
           console.log('🟢 AI SPEAKING MODE DEACTIVATED');
-          
+
           resolve();
         };
 
@@ -445,7 +449,7 @@ function RivaChatbot({ shouldPlayWelcome }) {
         console.log('🎙️ Stopped listening');
       }
     } else {
-      if (recognitionRef.current && !isSpeaking && !isTyping) {
+      if (recognitionRef.current && !isSpeaking && !isTyping && !isProcessing) {
         try {
           setIsListening(true);
           setError(null);
@@ -457,7 +461,7 @@ function RivaChatbot({ shouldPlayWelcome }) {
         }
       }
     }
-  }, [isListening, isSpeaking, isTyping]);
+  }, [isListening, isSpeaking, isTyping, isProcessing]);
 
   const clearConversation = async () => {
     if (!ttsInitializedRef.current) {
@@ -465,16 +469,16 @@ function RivaChatbot({ shouldPlayWelcome }) {
       window.speechSynthesis.speak(utterance);
       ttsInitializedRef.current = true;
     }
-    
+
     setMessages([]);
     setError(null);
     stopSpeaking();
-    
+
     if (typingIntervalRef.current) {
       clearTimeout(typingIntervalRef.current);
     }
     setIsTyping(false);
-    
+
     try {
       await fetch('http://localhost:5000/api/clear', { method: 'POST' });
     } catch (error) {
@@ -488,37 +492,37 @@ function RivaChatbot({ shouldPlayWelcome }) {
       window.speechSynthesis.speak(utterance);
       ttsInitializedRef.current = true;
     }
-    
+
     try {
       setError(null);
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } 
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
       });
-      
+
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const source = audioContext.createMediaStreamSource(stream);
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 256;
       source.connect(analyser);
-      
+
       const dataArray = new Uint8Array(analyser.frequencyBinCount);
       let maxLevel = 0;
       let checkCount = 0;
-      
+
       const checkLevel = () => {
         analyser.getByteFrequencyData(dataArray);
         const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
         maxLevel = Math.max(maxLevel, average);
         checkCount++;
-        
+
         setAudioLevel(average / 128);
-        
+
         if (checkCount >= 30) {
           stream.getTracks().forEach(track => track.stop());
           audioContext.close();
           setAudioLevel(0);
-          
+
           if (maxLevel > 10) {
             alert(`✅ Microphone working! Level: ${Math.round(maxLevel)}`);
           } else {
@@ -528,10 +532,10 @@ function RivaChatbot({ shouldPlayWelcome }) {
           setTimeout(checkLevel, 100);
         }
       };
-      
+
       alert('Testing microphone...\n\nSpeak now for 3 seconds!');
       checkLevel();
-      
+
     } catch (err) {
       alert('Microphone test failed!');
       setError('Microphone test failed');
@@ -588,7 +592,7 @@ function RivaChatbot({ shouldPlayWelcome }) {
       </div>
 
       <div className="center-controls">
-        <button 
+        <button
           className={`control-btn mic-btn ${isListening ? 'active recording' : ''}`}
           onClick={toggleMicRecording}
           disabled={isSpeaking || isTyping}
@@ -596,16 +600,16 @@ function RivaChatbot({ shouldPlayWelcome }) {
         >
           <MicIcon />
         </button>
-        
-        <button 
+
+        <button
           className="control-btn restart-btn"
           onClick={clearConversation}
           title="Restart"
         >
           <RestartIcon />
         </button>
-        
-        <button 
+
+        <button
           className="control-btn test-btn"
           onClick={testMicrophone}
           title="Test Microphone"
@@ -623,9 +627,9 @@ function RivaChatbot({ shouldPlayWelcome }) {
           disabled={isSpeaking || isTyping}
           rows={1}
         />
-        <button 
+        <button
           onClick={() => handleSendMessage()}
-          disabled={!inputText.trim() || isListening || isSpeaking || isTyping}
+          disabled={!inputText.trim() || isListening || isSpeaking || isTyping || isProcessing}
           className="send-btn-horizontal"
         >
           <SendIcon />
@@ -637,128 +641,8 @@ function RivaChatbot({ shouldPlayWelcome }) {
 
 // ===== MAIN APP COMPONENT =====
 function App() {
-  const [currentView, setCurrentView] = useState('inauguration'); // 'inauguration' or 'riva'
-
-  const teachers = [
-    {
-      name: 'Shreya Jain',
-      topic: 'Clubs & Activities',
-      photo: '/butki.jpg',
-      color: '#ffffff',
-      script: `A very good afternoon to one and all present here!
-
-Respected Executive Director, Director Academics, Director CRPC, Dean CSE (A I & AIML), esteemed faculty members, and my fellow innovators —
-
-I am Shreya Jain, President of the NextGen Supercomputing Club, and it gives me immense pleasure to welcome you all to this moment of pride and innovation. 🌟
-
-💡 The NextGen Supercomputing Club stands as a symbol of progress — a space where technology, creativity, and research come together.
-Our vision is to empower students to become industry-ready AI engineers capable of developing real-world, production-level solutions. 🚀
-
-🔭 Guided by our motto, 'Building Production Brains,' this club marks a new beginning in hands-on AI learning and innovation.
-
-At the heart of our initiative lies one of the most powerful computing systems on campus — the NVIDIA DGX A100 hundred Supercomputer, a platform designed to accelerate breakthroughs in Artificial Intelligence, Machine Learning, and High-Performance Computing. ⚙️💻
-
-👥 Behind this vision is a dedicated team of passionate members —
-Samarth Shukla (Vice President),
-Ujjawal Tyagi (PR Head),
-Preeti Singh (Graphics Head),
-Srashti Gupta and Vidisha Goel (Event Management Leads),
-Ronak Goel and Vinayak Rastogi (Technical Leads), and
-Divyansh Verma (Treasurer). 🎯
-
-Together, we work under the valuable guidance of our Dean, Dr. Rekha Kashyap, and with the mentorship of Dr. Richa Singh, Dr. Gaurav Srivastav, and Prof. Rajeev Singh, supported by our respected seniors Aayushker Singh and Swatantra Agarwal. 🙌🎓
-
-💫 To share more about the powerhouse that drives this journey of innovation, I would now like to invite Dr. Richa Singh ma'am to enlighten us further.`
-    },
-    {
-      name: 'Dr. Richa Singh',
-      topic: 'College Projects',
-      photo: '/richa madam.jpg',
-      color: '#ffffff',
-      script: `
-The NVIDIA DGX A hundred Supercomputer is not just a technological advancement — it’s a foundation for innovation and learning. 🖥️
-
-It provides our students and faculty with access to one of the most powerful AI infrastructures in academia.
-
-Equipped with eight NVIDIA A hundred GPUs — each powered by thousands of CUDA and Tensor cores — and interconnected through high-speed six NVSwitch links, the system delivers exceptional computational power and memory bandwidth. ⚡
-
-With massive GPU memory support, the DGX A hundred enables:
-
--Large-scale deep learning 
-
--Complex data processing 
-
--High-speed simulations 
-
-Through this facility, we are not only enhancing computational capability but also nurturing research, innovation, and collaboration.
-
-Our students are exploring advanced domains such as:
-
-Generative AI 
-
-Computer Vision 
-
-Data Analytics 
-
-This experience is helping them develop both the skills and the mindset needed for the future.
-
-To share how our students are leveraging this system through live projects and collaborations, I now invite Dr. Gaurav Srivastav sir. 🎤`
-    },
-    {
-      name: 'Dr. Gaurav Srivastav',
-      topic: 'Department Objectives',
-      photo: '/gaurav sir.jpg',
-      color: '#ffffff',
-      script: `The NextGen Supercomputing Club exemplifies how learning transforms into meaningful innovation when applied to real-world challenges.
-Our students are actively contributing through impactful projects under Smart India Hackathon 2025. 🚀
-
-🔹 NeptuneNexus
-Improving livestock management by monitoring residue levels and antimicrobial usage, ensuring safer and healthier farm outputs.
-
-🔹 TechYodhaas
-Preserving Sikkim’s cultural heritage by creating a digital platform for virtual monastery tours and cultural archiving.
-
-🔹 Omnitrix
-Promoting inclusivity in sports with an AI-powered talent assessment system that opens new opportunities for aspiring athletes.
-
-Each of these projects reflects our students’ creativity, teamwork, and commitment to leveraging technology for social good — staying aligned with our vision of Building Production Brains. 💡
-
-To share how these initiatives are evolving into broader research collaborations and industry partnerships, I now invite Prof. Rajeev Singh. 🙏`
-    },
-    {
-      name: ' Prof. Rajeev Singh',
-      topic: 'ETD & Training',
-      photo: '/rajeev sir.jpg',
-      color: '#ffffff',
-      script: `The NextGen Supercomputing Club exemplifies how academic learning and industry collaboration unite to create real impact.
-Through partnerships with Opinium.AI, Epsilon Pvt. Ltd., MetaUp Space, and AI Shala Technologies, our students are developing cutting-edge AI solutions across diverse domains. 🤝🚀
-
-With Opinium.AI, they’re building a Resume Recommender System that aligns candidate skills with job roles. 🤖
-
-In collaboration with Epsilon Pvt. Ltd., they’ve created a Real-Time Image-to-Avatar Swapping System using deep learning and computer vision. 🧠
-
-With MetaUp Space, they’re working on High-Performance Computing Frameworks to accelerate large-scale AI model execution. 💻
-
-And alongside AI Shala Technologies, they’re enhancing the RoboCasa Simulation Framework for intelligent robotic learning. 🤖
-
-Each collaboration enhances technical expertise, promotes innovation, and connects students directly with real-world AI challenges.
-With the dedication of our students and the guidance of our mentors, I’m confident that the NextGen Supercomputing Club will continue setting new benchmarks in applied AI and research excellence. 📈`
-    }
-  ];
-
-  const handleMoveToRiva = () => {
-    console.log('✓ Moving to Riva Chatbot...');
-    setCurrentView('riva');
-  };
-
   return (
-    <>
-      {currentView === 'inauguration' ? (
-        <Showcase teachers={teachers} onMoveToRiva={handleMoveToRiva} />
-      ) : (
-        <RivaChatbot shouldPlayWelcome={true} />
-      )}
-    </>
+    <RivaChatbot shouldPlayWelcome={true} />
   );
 }
 
