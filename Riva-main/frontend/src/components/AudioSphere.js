@@ -19,7 +19,7 @@ const AudioSphere = ({ audioLevel, isSpeaking }) => {
     if (isSpeaking && audioLevel > 0) {
       setBrightness(1.3 + audioLevel * 0.7);
       setScale(1 + audioLevel * 0.08);
-      
+
       // Speed up video when speaking
       if (videoRef.current) {
         videoRef.current.playbackRate = 1 + audioLevel * 0.5;
@@ -27,7 +27,7 @@ const AudioSphere = ({ audioLevel, isSpeaking }) => {
     } else {
       setBrightness(1);
       setScale(1);
-      
+
       if (videoRef.current) {
         videoRef.current.playbackRate = 1;
       }
@@ -35,7 +35,7 @@ const AudioSphere = ({ audioLevel, isSpeaking }) => {
   }, [audioLevel, isSpeaking]);
 
   return (
-    <div 
+    <div
       style={{
         position: 'fixed',
         top: 0,
@@ -71,8 +71,8 @@ const AudioSphere = ({ audioLevel, isSpeaking }) => {
             objectFit: 'contain'  // CHANGED: 'contain' keeps sphere centered and visible
           }}
         >
-          <source src="/sphere-animation.mp4" type="video/mp4" />
-          <source src="/sphere-animation.webm" type="video/webm" />
+          <source src="/golden.mp4" type="video/mp4" />
+          <source src="/golden.webm" type="video/webm" />
           Your browser does not support the video tag.
         </video>
       </div>
