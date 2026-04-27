@@ -1634,21 +1634,26 @@ Learning Outcomes:
 // GEMINI CHAT HANDLER
 // ===============================================
 async function handleGeminiChat(message) {
-  console.log('Calling Gemini 2.0 Flash API');
+  const modelName = 'gemini-3-flash-preview';
+  console.log(`Calling Gemini API with model: ${modelName}`);
 
-  const model = genAI.getGenerativeModel({ 
-    model: 'gemini-2.0-flash',
-    generationConfig: {
-      temperature: 0.7,
-      topP: 0.95,
-      topK: 40,
-      maxOutputTokens: 1024,
-    },
-  });
+  try {
+    const model = genAI.getGenerativeModel({ 
+      model: modelName,
+      generationConfig: {
+        temperature: 0.7,
+        topP: 0.95,
+        topK: 40,
+        maxOutputTokens: 1024,
+      },
+    });
 
-  const systemPrompt = `You are RIVA, a female AI assistant for the NextGen Supercomputing Club at KIET Group of Institutions.
+    const systemPrompt = `You are RIVA, a female AI assistant for the NextGen Supercomputing Club at KIET Group of Institutions.
 
 You are a general-purpose AI assistant who can answer ANY question about ANY topic.
+
+CURRENT CONTEXT (April 2026):
+- The current Chief Minister of Delhi is Rekha Gupta (since 2025).
 
 You have specialized knowledge about the NextGen Supercomputing Club:
 
@@ -1675,27 +1680,30 @@ RESPONSE RULES:
 
 Be conversational, helpful, and accurate.`;
 
-  const chat = model.startChat({
-    history: [
-      {
-        role: 'user',
-        parts: [{ text: systemPrompt }]
-      },
-      {
-        role: 'model',
-        parts: [{ text: 'Understood. I am RIVA, the AI assistant for NextGen Supercomputing Club. I can answer questions about the club, SIH projects, collaborations, and any general topic. I will be concise, accurate, and helpful without using emojis or special formatting.' }]
-      },
-      ...conversationHistory.map(msg => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
-      }))
-    ]
-  });
+    const chat = model.startChat({
+      history: [
+        {
+          role: 'user',
+          parts: [{ text: systemPrompt }]
+        },
+        {
+          role: 'model',
+          parts: [{ text: 'Understood. I am RIVA, the AI assistant for NextGen Supercomputing Club. I can answer questions about the club, SIH projects, collaborations, and any general topic. I will be concise, accurate, and helpful without using emojis or special formatting.' }]
+        },
+        ...conversationHistory.map(msg => ({
+          role: msg.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: msg.content }]
+        }))
+      ]
+    });
 
-  const result = await chat.sendMessage(message);
-  console.log('Gemini response generated');
-
-  return result.response.text();
+    const result = await chat.sendMessage(message);
+    console.log(`Gemini response generated using ${modelName}`);
+    return result.response.text();
+  } catch (error) {
+    console.error(`Gemini Error (${modelName}):`, error.message);
+    throw error;
+  }
 }
 
 // ===============================================
@@ -1900,23 +1908,4 @@ const server = app.listen(PORT, () => {
   console.log(`SIH Projects: Loaded`);
   console.log(`Voice Support: Browser TTS`);
   console.log(`Dialogue Triggers: Configured`);
-  console.log('\nAvailable Endpoints:');
-  console.log('   POST /api/chat - Main chat endpoint');
-  console.log('   POST /api/clear - Clear conversation');
-  console.log('   GET  /api/history - Get chat history');
-  console.log('   GET  /api/health - Health check');
-  console.log('   GET  /api/models - Available AI models');
-  console.log('   GET  /api/club/info - Club information');
-  console.log('   GET  /api/sih/projects - SIH projects info');
-  console.log('\nSpecial Triggers:');
-  console.log('   "inauguration" - Start inauguration ceremony');
-  console.log('   "tell me about the club" - Club introduction');
-  console.log('   "who are the mentors" - Mentor information');
-  console.log('   "club team" - Team structure');
-  console.log('   "sih projects" - Smart India Hackathon projects');
-  console.log('   "computer vision project" - CV-based SIH projects');
-  console.log('   "chatbot" - Chatbot SIH project');
-  console.log('   "medical image" - Medical imaging SIH project');
-  console.log('   "generative ai" - Generative AI SIH project');
-  console.log('='.repeat(70) + '\n');
 });

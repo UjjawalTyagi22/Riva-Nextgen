@@ -15,6 +15,7 @@
     "@anthropic-ai/sdk": "^0.x.x",
     "@google/generative-ai": "^0.24.1",
     "axios": "^1.12.2",
+    "combined-stream": "^1.0.8",
     "cors": "^2.x.x",
     "dotenv": "^16.6.1",
     "express": "^4.x.x",

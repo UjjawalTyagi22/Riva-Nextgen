@@ -48,6 +48,7 @@ function RivaChatbot({ shouldPlayWelcome }) {
   const [isTyping, setIsTyping] = useState(false);
   const [hasPlayedWelcome, setHasPlayedWelcome] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   const recognitionRef = useRef(null);
   const audioIntervalRef = useRef(null);
@@ -78,15 +79,38 @@ function RivaChatbot({ shouldPlayWelcome }) {
     }
   }, [messages]);
 
+  // ✨ TRACK USER INTERACTION TO ENABLE TTS
+  useEffect(() => {
+    const handleInteraction = () => {
+      console.log('👆 User interacted - TTS enabled');
+      setHasInteracted(true);
+      // Remove listeners after first interaction
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+    };
+
+    window.addEventListener('click', handleInteraction);
+    window.addEventListener('keydown', handleInteraction);
+
+    return () => {
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+    };
+  }, []);
+
   // ✨ PLAY WELCOME MESSAGE ON MOUNT - SPEAK ONLY (NO TEXT)
   useEffect(() => {
-    if (shouldPlayWelcome && !hasPlayedWelcome) {
+    if (shouldPlayWelcome && !hasPlayedWelcome && hasInteracted) {
       setHasPlayedWelcome(true);
 
       // Initialize TTS first
       const utterance = new SpeechSynthesisUtterance('');
-      window.speechSynthesis.speak(utterance);
-      ttsInitializedRef.current = true;
+      try {
+        window.speechSynthesis.speak(utterance);
+        ttsInitializedRef.current = true;
+      } catch (e) {
+        console.warn('⚠️ Initial TTS activation failed:', e);
+      }
 
       // Play welcome message after a short delay
       setTimeout(() => {
@@ -96,7 +120,7 @@ function RivaChatbot({ shouldPlayWelcome }) {
         speak(welcomeMessage);
       }, 500);
     }
-  }, [shouldPlayWelcome, hasPlayedWelcome]);
+  }, [shouldPlayWelcome, hasPlayedWelcome, hasInteracted]);
 
   // ✨ TYPEWRITER EFFECT FUNCTION
   const typewriterEffect = useCallback((fullText, callback) => {
@@ -322,7 +346,7 @@ function RivaChatbot({ shouldPlayWelcome }) {
       // 🎯 SHREYA JAIN VOICE - Google UK English Female
       let selectedVoice = null;
 
-      // Priority 1: Google UK English Female (Shreya Jain's voice)
+      // Priority 1: Google UK English Female 
       selectedVoice = voices.find(v =>
         v.lang.includes('en-GB') &&
         (v.name.toLowerCase().includes('female') ||
