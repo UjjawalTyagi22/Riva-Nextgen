@@ -1,188 +1,105 @@
-**RIVA** is an intelligent voice-powered AI assistant built for the **NextGen Supercomputing Club** at KIET Group of Institutions. It combines cutting-edge AI technology with an immersive 3D audio visualization experience.
+**RIVA** is an intelligent voice-powered AI assistant built for the **NextGen Supercomputing Club** at KIET Group of Institutions. It combines cutting-edge AI technology with an immersive 3D audio visualization experience to serve as the club's digital host and expert.
 
-## Features
+## 🚀 Features
 
--   **Continuous Voice Recognition**: Hands-free conversation mode with automatic feedback loop prevention.
--   **Gemini 2.0 Flash AI**: Powered by Google's latest AI model for intelligent responses.
--   **3D AudioSphere Visualization**: Real-time animated sphere that reacts to voice.
--   **Browser TTS (en-IN)**: Natural Indian English voice output.
--   **Dual Panel UI**: Split view showing AI and user messages separately.
--   **Club Knowledge Base**: Serves as an expert on NextGen Supercomputing Club information.
--   **Smart Response Mode**: Provides detailed introductions and crisp answers for general queries.
+-   **Gemini 3 Flash AI**: Powered by Google's latest `gemini-3-flash-preview` model for ultra-fast and intelligent responses.
+-   **Voice-First Interaction**: Integrated hands-free conversation capabilities using Browser Web Speech API.
+-   **3D AudioSphere Visualization**: A real-time Three.js animated sphere that reacts dynamically to voice amplitude and frequency.
+-   **Split-Panel UI**: A premium dark-themed interface with separate streams for AI responses and user inputs.
+-   **Deep Knowledge Base**: Specialized expert knowledge on the NextGen Supercomputing Club and **Smart India Hackathon (SIH) 2025** projects.
+-   **Intelligent Response Logic**: 
+    -   Detailed, formatted introductions for club-specific queries.
+    -   Concise, "short & crisp" (2-4 sentences) answers for general topics.
+    -   Natural typewriter effect for all AI messages.
+-   **Multi-Model Ready**: Backend support for both Google Gemini and OpenAI (GPT-4o Mini) providers.
 
-## Tech Stack
+## 🛠 Tech Stack
 
 ### Backend
--   **Node.js + Express**: REST API server
--   **Google Gemini 2.0 Flash**: AI chat responses
--   **OpenAI Whisper** (optional): Speech-to-text
--   **ElevenLabs** (optional): Voice cloning TTS
+-   **Node.js & Express**: Core API server.
+-   **Google Generative AI**: Gemini 3 Flash Preview integration.
+-   **OpenAI SDK**: Support for GPT-4o Mini and Whisper STT.
+-   **Dotenv**: Secure environment variable management.
 
 ### Frontend
--   **React**: UI framework
--   **Three.js**: 3D AudioSphere visualization
--   **Web Speech API**: Browser-based STT/TTS
--   **React Markdown**: Message formatting
+-   **React.js**: UI component architecture.
+-   **Three.js**: 3D rendering engine for the AudioSphere.
+-   **Web Speech API**: Native browser support for STT (Speech-to-Text) and TTS (Text-to-Speech).
+-   **React Markdown**: Rich text formatting for AI responses.
 
-## Installation
+## 📦 Project Structure
 
-### Prerequisites
--   Node.js 16+
--   npm or yarn
+```text
+Riva-main/
+├── backend/
+│   ├── server.js           # Main Express server & AI logic
+│   ├── list_models.js      # Utility to check available Gemini models
+│   ├── .env                # Environment configurations (API Keys)
+│   └── package.json        # Backend dependencies
+├── frontend/
+│   ├── src/
+│   │   ├── App.js          # Core React application logic
+│   │   ├── App.css         # Premium styling and animations
+│   │   └── components/
+│   │       └── AudioSphere.js # Three.js visualization component
+│   └── package.json        # Frontend dependencies
+└── README.md               # Main project documentation
+```
 
-### Backend Setup
+## ⚙️ Installation & Setup
 
+### 1. Prerequisites
+-   Node.js (v16.x or higher)
+-   NVIDIA API Key (optional, for hardware-specific info)
+-   Gemini API Key (Required)
+
+### 2. Backend Setup
 ```bash
 cd backend
 npm install
 ```
-
-Create a `.env` file (you can copy from `.env.example`):
+Create a `.env` file in the `backend` folder:
 ```env
-GEMINI_API_KEY=your_gemini_api_key
-OPENAI_API_KEY=your_openai_api_key
-ELEVENLABS_API_KEY=your_elevenlabs_api_key
-ELEVENLABS_VOICE_ID=your_voice_id
-USE_ELEVENLABS=false
-USE_WHISPER=false
+GEMINI_API_KEY=your_key_here
+AI_PROVIDER=gemini
+PORT=5000
 ```
-
-Start the backend server:
+Start the server:
 ```bash
 node server.js
 ```
 
-### Frontend Setup
-
+### 3. Frontend Setup
 ```bash
 cd frontend
 npm install
 npm start
 ```
 
-## Usage
+## 🎮 Usage & Commands
 
-1.  **Start Backend**: Run `node server.js` in the `backend` directory.
-2.  **Start Frontend**: Run `npm start` in the `frontend` directory.
-3.  **Open Browser**: Navigate to `http://localhost:3000`.
-4.  **Click Continuous Mode**: Enable hands-free conversation.
-5.  **Start Speaking**: RIVA will listen, respond, and speak back.
+1.  **Welcome Message**: RIVA greets you automatically upon the first interaction.
+2.  **Voice Input**: Click the **Mic Icon** to start speaking. RIVA detects your voice and processes the request.
+3.  **Special Triggers**:
+    -   *"Are you ready to take over?"*: RIVA delivers the full club inauguration speech.
+    -   *"Tell me about the club"*: Provides a comprehensive overview of mission and activities.
+    -   *"Tell me about SIH projects"*: Lists all Smart India Hackathon projects under the club.
+4.  **Microphone Test**: Use the **Test Mic** button to calibrate your audio levels.
 
-### Special Commands
+## 🧠 Knowledge Domains
 
--   **"Are you ready to take over?"**: Triggers the full inauguration speech.
--   **"Tell me about the club"**: Provides a detailed club introduction.
--   **General questions**: Elicits short, crisp 2-4 sentence answers.
+### NextGen Supercomputing Club
+-   **Focus**: HPC, AI/ML, Quantum Computing, and GPU Programming.
+-   **Hardware**: Access to **NVIDIA DGX A100** Supercomputer.
+-   **Motto**: "Building Production Brains".
 
-## Features Breakdown
+### SIH 2025 Projects
+RIVA contains detailed information on various student projects:
+-   **CodeGamma**: Livestock Management System.
+-   **JanMitr**: Civic Infrastructure Platform.
+-   **TechYodhaas**: Digital Heritage Preservation.
+-   **Omnitrix**: AI-Powered Sports Performance Analytics.
 
-### Continuous Mode
--   Automatic voice detection.
--   AI speech detection prevention to avoid feedback loops.
--   A two-second cooldown after the AI finishes speaking.
--   Smart input filtering to ignore minor noises.
 
-### AudioSphere
--   Real-time audio level visualization.
--   Vertex displacement based on voice amplitude.
--   Smooth scaling transitions during speech.
--   An idle "breathing" animation.
--   Glow intensity changes that correspond to audio levels.
-
-### Response Intelligence
--   **Club Introduction**: Delivers detailed, comprehensive answers about the club.
--   **Other Questions**: Responds with concise 2-4 sentence answers.
--   **Context Awareness**: Maintains conversation history for follow-up questions.
--   **Fallback Handling**: Manages errors gracefully.
-
-## Project Structure
-
-```
-RIVA/
-├── backend/
-│   ├── server.js           # Main Express server
-│   ├── .env.example        # Environment template
-│   ├── .gitignore          # Git ignore rules
-│   └── package.json        # Backend dependencies
-├── frontend/
-│   ├── src/
-│   │   ├── App.js            # Main React component
-│   │   ├── App.css           # Styling
-│   │   └── components/
-│   │       └── AudioSphere.js  # 3D visualization
-│   └── package.json        # Frontend dependencies
-└── README.md               # This file
-```
-
-## Configuration
-
-### Backend Settings
--   `PORT`: Server port (default: 5000).
--   `USE_ELEVENLABS`: Enable ElevenLabs TTS (default: false).
--   `USE_WHISPER`: Enable OpenAI Whisper STT (default: false).
-
-### Frontend Settings
--   **Continuous mode delay**: 2000ms
--   **Audio level smoothing**: 0.15
--   **Sphere expansion**: 30% maximum
--   **Voice language**: en-IN (Indian English)
-
-## About NextGen Supercomputing Club
-
-RIVA is the official AI assistant for the NextGen Supercomputing Club at KIET Group of Institutions. The club focuses on:
-
--   High-Performance Computing (HPC)
--   Artificial Intelligence & Machine Learning
--   Quantum Computing & Simulation
--   GPU Programming & Optimization
-
-**Tagline**: "Building Production Brains"
-
-## Team
-
-### Core Members
--   **President**: Shreya Jain
--   **Vice President**: Samarth Shukla
--   **PR Head**: Ujjawal Tyagi
--   **Graphics Head**: Preeti Singh
--   **Event Management**: Srashti Gupta & Vidisha Goel
--   **Technical Leads**: Ronak Goel & Vinayak Rastogi
--   **Treasurer**: Divyansh Verma
-
-### Mentors
--   Dr. Gaurav Srivastava
--   Dr. Richa Singh
--   Dr. Bikki Kumar
-
-### Leadership
--   **HOD**: Dr. Rekha Kashyap
--   **Director**: Dr. Manoj Goel
--   **Director Academics**: Dr. Adesh Kumar Pandey
-
-## Known Issues
-
--   Browser TTS may require initial user interaction (a button click) to function.
--   Continuous mode may occasionally be activated by loud background noise.
--   AudioSphere performance is dependent on the user's GPU capabilities.
-
-## Future Enhancements
-
--   [ ] Multi-language support
--   [ ] Voice cloning integration
--   [ ] Mobile responsive design
--   [ ] Conversation export feature
--   [ ] Custom wake word detection
-
-## License
-
-This project is developed for the NextGen Supercomputing Club at KIET Group of Institutions.
-
-## Contributing
-
-Contributions are welcome. Please feel free to submit issues or pull requests to improve the project.
-
-***
-
-**Built by the NextGen Supercomputing Club**
-
+**Built by Ujjawal Tyagi**
 *Where Intelligence Meets Innovation*
